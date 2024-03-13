@@ -12,6 +12,7 @@ const {
   deleteAllNotificationCtrl,
   getAllDoctorsCtrl,
   bookAppointmentCtrl,
+  adminLogin,
 } = require("../controllers/userCtrl");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -19,6 +20,9 @@ const router = express.Router();
 
 // login POST
 router.post("/login", loginCtrl);
+
+//admin login POST
+router.post("/admin-login", adminLogin);
 // register POST
 router.post("/register", registerController);
 

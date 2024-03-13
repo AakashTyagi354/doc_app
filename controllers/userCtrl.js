@@ -31,6 +31,47 @@ const registerController = async (req, res) => {
 };
 
 // login
+const adminLogin = async (req, res) => {
+  try {
+    const user = await userModel.findOne({ email: req.body.email });
+    if (!user) {
+      return res.status(200).send({
+        success: false,
+        message: "User Not Exist",
+      });
+    }
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
+      return res.status(200).send({
+        success: false,
+        message: "Invalid Email or  Password",
+      });
+    }
+    if(user.isAdmin === false){
+      return res.status(200).send({
+        success: false,
+        message: "You are not admin",
+      });
+    }
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1D",
+    });
+    res.status(200).send({
+      success: true,
+      message: "Login Sucessfully",
+      user,
+      token,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      message: `Login Controller ${err.message}`,
+    });
+  }
+};
+
+// login
 const loginCtrl = async (req, res) => {
   try {
     const user = await userModel.findOne({ email: req.body.email });
@@ -345,4 +386,5 @@ module.exports = {
   bookingAvailiblityCtrl,
   userAppointmentsCtrl,
   getDoctors,
+  adminLogin
 };

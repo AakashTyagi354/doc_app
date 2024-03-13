@@ -46,7 +46,7 @@ const doctorSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      default: "panding",
+      default: "pending",
     },
     timings: {
       type: Object,

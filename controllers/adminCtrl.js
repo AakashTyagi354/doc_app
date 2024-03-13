@@ -43,15 +43,16 @@ const changeAccountStatusCtrl = async (req, res) => {
   try {
     const { doctorId, status } = req.body;
     const doctor = await doctorModel.findByIdAndUpdate(doctorId, { status });
-    const user = await userModel.findOne({ _id: doctor.userId });
-    const notification = user.notification;
-    notification.push({
-      type: "doctor-account-request-updated",
-      message: `Your Doctor Account Request Has ${status}`,
-      onClickPth: "/notification",
-    });
-    user.isDoctor = status === "approved" ? true : false;
-    await user.save();
+    // const user = await userModel.findOne({ _id: doctor.userId });
+    // const notification = doctor.notification;
+    // notification.push({
+    //   type: "doctor-account-request-updated",
+    //   message: `Your Doctor Account Request Has ${status}`,
+    //   onClickPth: "/notification",
+    // });
+    // user.isDoctor = status === "approved" ? true : false;
+    
+    await doctor.save();
     res.status(201).send({
       success: true,
       message: "Account Status Updated",
