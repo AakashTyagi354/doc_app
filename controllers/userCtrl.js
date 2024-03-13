@@ -65,6 +65,22 @@ const loginCtrl = async (req, res) => {
   }
 };
 
+// get doctors
+const getDoctors = async (req, res) => {
+  try {
+    const doctors = await doctorModel.find({ status: "approved" });
+    res
+      .status(201)
+      .send({ message: "All doctors available", success: true, doctors });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      message: `error in fetching all doctores for user ${err.message}`,
+    });
+  }
+};
+
 const authCtrl = async (req, res) => {
   try {
     const user = await userModel.findById({ _id: req.body.userId });
@@ -124,17 +140,17 @@ const applyDoctorCtrl = async (req, res) => {
 const getAllNotificationCtrl = async (req, res) => {
   try {
     const user = await userModel.findOne({ _id: req.body.userId });
-    const seennotification = user.seennotification;
+    // const seennotification = user.seennotification;
     const notification = user.notification;
-    seennotification.push(...notification);
-    user.notification = [];
-    user.seennotification = notification;
+    // seennotification.push(...notification);
+    // user.notification = [];
+    // user.seennotification = notification;
 
-    const updatedUser = await user.save();
+    // const updatedUser = await user.save();
     res.status(200).send({
       success: true,
       message: "all notification marked as read",
-      data: updatedUser,
+      notification,
     });
   } catch (err) {
     console.log(err);
@@ -147,14 +163,29 @@ const getAllNotificationCtrl = async (req, res) => {
 
 const deleteAllNotificationCtrl = async (req, res) => {
   try {
+    // const user = await userModel.findOne({ _id: req.body.userId });
+    // user.notification = [];
+    // user.seennotification = [];
+    // const updatedUser = await user.save();
+    // updatedUser.password = undefined;
+    // res.status(200).send({
+    //   success: true,
+    //   message: "all notification deleted ",
+    //   data: updatedUser,
+    // });
+
     const user = await userModel.findOne({ _id: req.body.userId });
-    user.notification = [];
-    user.seennotification = [];
+
+    // Remove the notification at the specified index
+    user.notification.splice(req.body.idx, 1);
+
+    // Save the updated user
     const updatedUser = await user.save();
     updatedUser.password = undefined;
+
     res.status(200).send({
       success: true,
-      message: "all notification deleted ",
+      message: "Notification deleted successfully",
       data: updatedUser,
     });
   } catch (err) {
@@ -189,16 +220,43 @@ const bookAppointmentCtrl = async (req, res) => {
     req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString();
     req.body.time = moment(req.body.time, "HH:mm").toISOString();
     req.body.status = "pending";
+    const exisitingAppointment = await appointmentModel.findOne({
+      userId: req.body.userId,
+      doctorId: req.body.doctorId,
+      date: req.body.date,
+      time: req.body.time,
+    });
+    if (exisitingAppointment) {
+      return res.status(200).send({
+        message: "Appointment booked already only allowed once at a time",
+      });
+    }
     const newAppointment = new appointmentModel(req.body);
     await newAppointment.save();
+    console.log(req.body);
+    // const user = await userModel.findOne({ _id: req.body.doctorInfo.userId });
+    // user.notification.push({
+    //   type: "New-Appointment-Request",
+    //   message: `a new appoinment request from ${req.body.userInfo.name}`,
+    //   onClickPath: "/user/appoinments",
+    // });
+    // await user.save();
 
-    const user = await userModel.findOne({ _id: req.body.doctorInfo.userId });
+    const user = await userModel.findOne({ _id: req.body.userId });
     user.notification.push({
       type: "New-Appointment-Request",
-      message: `a new appoinment request from ${req.body.userInfo.name}`,
+      message: `a new appoinment request with Dr. ${req.body.doctorInfo} has been created`,
       onClickPath: "/user/appoinments",
     });
     await user.save();
+
+    // const doctor = await doctorModel.findOne({ _id: req.body.doctorId });
+    // doctor.notification.push({
+    //   type: "New-Appointment-Request",
+    //   message: `a new appoinment request from  ${req.body.userInfo} has been created`,
+    //   onClickPath: "/user/appoinments",
+    // });
+    // await doctor.save();
     res.status(200).send({
       success: true,
       message: "appoinment booked successfully",
@@ -214,6 +272,7 @@ const bookAppointmentCtrl = async (req, res) => {
 
 // booking available
 const bookingAvailiblityCtrl = async (req, res) => {
+  console.log("hello", req.body);
   try {
     const date = moment(req.body.date, "DD-MM-YYYY").toISOString();
     const formTime = moment(req.body.time, "HH:mm")
@@ -221,15 +280,21 @@ const bookingAvailiblityCtrl = async (req, res) => {
       .toISOString();
     const toTime = moment(req.body.time, "HH:mm").add(1, "hours").toISOString();
     const doctorId = req.body.doctorId;
-    const appointment = await appointmentModel.find({
-      doctorId,
-      date,
-      time: {
-        $gte: formTime,
-        $lte: toTime,
-      },
+    // const appointment = await appointmentModel.find({
+    //   doctorId,
+    //   date,
+    //   time: {
+    //     $gte: formTime,
+    //     $lte: toTime,
+    //   },
+    // });
+    const exisitingAppointment = await appointmentModel.findOne({
+      userId: req.body.userId,
+      doctorId: req.body.doctorId,
+      date: req.body.date,
+      time: req.body.time,
     });
-    if (appointment.length > 0) {
+    if (exisitingAppointment?.length > 0) {
       return res.status(200).send({
         success: true,
         message: "Appointment Already Booked",
@@ -279,4 +344,5 @@ module.exports = {
   bookAppointmentCtrl,
   bookingAvailiblityCtrl,
   userAppointmentsCtrl,
+  getDoctors,
 };

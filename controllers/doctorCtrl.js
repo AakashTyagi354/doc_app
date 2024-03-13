@@ -3,6 +3,28 @@ const appoinmentModel = require("../models/appoinmentModel");
 const userModel = require("../models/userModel");
 // const appointmentModel = require("../models/appoinmentModel");
 
+const getAllDoctors = async (req, res) => {
+  try {
+    // Assuming you have a method like `find` to retrieve all doctors from the database
+    const doctors = await doctorModel.find();
+    console.log(doctors);
+
+    // Send the retrieved doctors as a response
+    res.status(200).send({
+      success: true,
+      message: "All doctors fetched successfully",
+      data: doctors, // Use plural `doctors` instead of `doctor`
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      err,
+      message: "Error in fetching all doctors",
+    });
+  }
+};
+
 const getDoctorInfoCtrl = async (req, res) => {
   try {
     const doctor = await doctorModel.findOne({ userId: req.body.userId });
@@ -118,4 +140,5 @@ module.exports = {
   getDoctorByIdCtrl,
   doctorAppointmentsCtrl,
   updateStatusCtrl,
+  getAllDoctors,
 };

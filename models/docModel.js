@@ -24,6 +24,10 @@ const doctorSchema = new mongoose.Schema(
     website: {
       type: String,
     },
+    languages: {
+      type: Array,
+      required: true,
+    },
     address: {
       type: String,
       required: true,
@@ -33,21 +37,19 @@ const doctorSchema = new mongoose.Schema(
       required: true,
     },
     experience: {
-      type: String,
+      type: Number,
       required: true,
     },
     feesPerCunsaltation: {
       type: Number,
       required: true,
     },
-    status:{
-       type:String,
-       default:'panding'
+    status: {
+      type: String,
+      default: "panding",
     },
     timings: {
       type: Object,
-    
-      
     },
   },
   {

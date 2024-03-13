@@ -1,40 +1,55 @@
-const express = require('express');
-const { login, loginCtrl, registerController, authCtrl,userAppointmentsCtrl ,bookingAvailiblityCtrl,applyDoctorCtrl,getAllNotificationCtrl,deleteAllNotificationCtrl,getAllDoctorsCtrl, bookAppointmentCtrl} = require('../controllers/userCtrl');
-const authMiddleware = require('../middleware/authMiddleware');
-
-
+const express = require("express");
+const {
+  login,
+  loginCtrl,
+  registerController,
+  getDoctors,
+  authCtrl,
+  userAppointmentsCtrl,
+  bookingAvailiblityCtrl,
+  applyDoctorCtrl,
+  getAllNotificationCtrl,
+  deleteAllNotificationCtrl,
+  getAllDoctorsCtrl,
+  bookAppointmentCtrl,
+} = require("../controllers/userCtrl");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
 // login POST
-router.post('/login',loginCtrl)
+router.post("/login", loginCtrl);
 // register POST
-router.post('/register',registerController)
+router.post("/register", registerController);
 
+router.get("/get-doctors", getDoctors);
 
 // auth POST
-router.post('/getUserData',authMiddleware,authCtrl)
+router.post("/getUserData", authMiddleware, authCtrl);
 
 // apply doc POST
-router.post('/apply-doctor',authMiddleware,applyDoctorCtrl)
+router.post("/apply-doctor", applyDoctorCtrl);
 
 // notificatio  POST
-router.post('/get-all-notification',authMiddleware,getAllNotificationCtrl)
+router.post("/get-all-notification", authMiddleware, getAllNotificationCtrl);
 
 // notificatio  POST
-router.post('/delete-all-notification',authMiddleware,deleteAllNotificationCtrl)
+router.post(
+  "/delete-all-notification",
+  authMiddleware,
+  deleteAllNotificationCtrl
+);
 
-// get all doctor
-router.get('/getAllDoctors',getAllDoctorsCtrl)
+// // get all doctor
+// router.get("/getAllDoctors", getAllDoctorsCtrl);
 
 // book a appointment
-router.post('/book-appointment',authMiddleware,bookAppointmentCtrl)
-
+router.post("/book-appointment", authMiddleware, bookAppointmentCtrl);
 
 // booking aviablity
-router.post('/booking-availbility', authMiddleware,bookingAvailiblityCtrl)
+router.post("/booking-availbility", authMiddleware, bookingAvailiblityCtrl);
 
 // appointment list
-router.get('/user-appointments',authMiddleware,userAppointmentsCtrl)
+router.get("/user-appointments", authMiddleware, userAppointmentsCtrl);
 
-module.exports = router
+module.exports = router;
