@@ -1,7 +1,51 @@
 const doctorModel = require("../models/docModel");
 const appoinmentModel = require("../models/appoinmentModel");
 const userModel = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 // const appointmentModel = require("../models/appoinmentModel");
+
+// login
+
+const doctorLogin = async (req, res) => {
+  try {
+    const doctor = await doctorModel.findOne({ email: req.body.email });
+    if (!doctor) {
+      return res.status(200).send({
+        success: false,
+        message: "Doctor Not Found",
+      });
+    }
+    const isMatch = await bcrypt.compare(req.body.password, doctor.password);
+    if (!isMatch) {
+      return res.status(200).send({
+        success: false,
+        message: "Invalid Email or  Password",
+      });
+    }
+    if (doctor.status === "pending") {
+      return res.status(200).send({
+        success: false,
+        message: "Doctor Not Found",
+      });
+    }
+    const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET, {
+      expiresIn: "1D",
+    });
+    res.status(200).send({
+      success: true,
+      message: "Login Sucessfully",
+      doctor,
+      token,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      message: `Login Controller ${err.message}`,
+    });
+  }
+};
 
 const getAllDoctors = async (req, res) => {
   try {
@@ -84,9 +128,9 @@ const getDoctorByIdCtrl = async (req, res) => {
 };
 const doctorAppointmentsCtrl = async (req, res) => {
   try {
-    const doctor = await doctorModel.findOne({ userId: req.body.userId });
+    // const doctor = await doctorModel.findOne({ userId: req.body.userId });
     const appoinment = await appoinmentModel.find({
-      doctorId: doctor._id,
+      doctorId: req.body.doctorId,
     });
     res.status(200).send({
       success: true,
@@ -141,4 +185,5 @@ module.exports = {
   doctorAppointmentsCtrl,
   updateStatusCtrl,
   getAllDoctors,
+  doctorLogin,
 };

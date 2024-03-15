@@ -1,13 +1,12 @@
-import express from "express";
-
-import {
-  categoryControlller,
+const express = require("express");
+const {
+  categoryController,
   createCategoryController,
   deleteCategoryCOntroller,
   singleCategoryController,
   updateCategoryController,
-} from "./../controllers/categoryController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
+} = require("./../controllers/categoryController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -18,13 +17,13 @@ router.post("/create-category", authMiddleware, createCategoryController);
 //update category
 router.put("/update-category/:id", authMiddleware, updateCategoryController);
 
-//getALl category
-router.get("/get-category", categoryControlller);
+//getAll category
+router.get("/get-category", categoryController);
 
 //single category
 router.get("/single-category/:slug", singleCategoryController);
 
 //delete category
-router.delete("/delete-category/:id", authMiddleware, deleteCategoryCOntroller);
+// router.delete("/delete-category/:id", authMiddleware, deleteCategoryCOntroller);
 
-export default router;
+module.exports = router;

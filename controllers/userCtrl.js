@@ -47,7 +47,7 @@ const adminLogin = async (req, res) => {
         message: "Invalid Email or  Password",
       });
     }
-    if(user.isAdmin === false){
+    if (user.isAdmin === false) {
       return res.status(200).send({
         success: false,
         message: "You are not admin",
@@ -147,34 +147,84 @@ const authCtrl = async (req, res) => {
 };
 
 // apply doc
-
 const applyDoctorCtrl = async (req, res) => {
   try {
-    const newDoctor = await doctorModel({ ...req.body, status: "pendling" });
-    await newDoctor.save();
+    // Hash the password
+    const password = req.body.password;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create a new doctor document with the hashed password
+    const doctorData = {
+      ...req.body,
+      password: hashedPassword,
+      status: "pending",
+    };
+    const doctor = new doctorModel(doctorData);
+    await doctor.save();
+
+    // Update admin's notification
     const adminUser = await userModel.findOne({ isAdmin: true });
-    const notification = adminUser.notification;
-    notification.push({
+    adminUser.notification.push({
       type: "apply-doctor-request",
-      message: `${newDoctor.firstName} ${newDoctor.lastName} has applied for doc account`,
+      message: `${doctor.firstName} ${doctor.lastName} has applied for a doctor account`,
       data: {
-        doctorId: newDoctor._id,
-        name: newDoctor.firstName + " " + newDoctor.lastName,
+        doctorId: doctor._id,
+        name: doctor.firstName + " " + doctor.lastName,
         onClickPath: "/admin/doctors",
       },
     });
-    await userModel.findByIdAndUpdate(adminUser._id, { notification });
+    await adminUser.save();
+
+    // Send success response
     res
       .status(201)
-      .send({ message: "Apply Doctor Sucessfully", success: true });
+      .send({ message: "Doctor registration successful", success: true });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).send({
       success: false,
-      message: `apply doc  ${err.message}`,
+      message: `Failed to apply as a doctor: ${err.message}`,
     });
   }
 };
+
+// const applyDoctorCtrl = async (req, res) => {
+//   try {
+//     const newDoctor = await doctorModel({ ...req.body, status: "pendling" });
+//     await newDoctor.save();
+//     const adminUser = await userModel.findOne({ isAdmin: true });
+//     const notification = adminUser.notification;
+
+//     const password = req.body.password;
+//     const salt = await bcrypt.genSalt(10);
+//     const hashedPassword = await bcrypt.hash(password, salt);
+//     req.body.password = hashedPassword;
+//     const doctor = new doctorModel(req.body);
+//     await doctor.save();
+
+//     res.status(201).send({ message: "Register Sucessfully", success: true });
+//     notification.push({
+//       type: "apply-doctor-request",
+//       message: `${newDoctor.firstName} ${newDoctor.lastName} has applied for doc account`,
+//       data: {
+//         doctorId: newDoctor._id,
+//         name: newDoctor.firstName + " " + newDoctor.lastName,
+//         onClickPath: "/admin/doctors",
+//       },
+//     });
+//     await userModel.findByIdAndUpdate(adminUser._id, { notification });
+//     res
+//       .status(201)
+//       .send({ message: "Apply Doctor Sucessfully", success: true });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send({
+//       success: false,
+//       message: `apply doc  ${err.message}`,
+//     });
+//   }
+// };
 
 // notification ctrl
 
@@ -374,6 +424,25 @@ const userAppointmentsCtrl = async (req, res) => {
   }
 };
 
+// update appointment with roomid
+const updateAppoitment = async (req, res) => {
+  try {
+    const appointment = await appointmentModel.find({
+      userId: req.body.userId,
+    });
+    res.status(200).send({
+      success: true,
+      data: appointment,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      message: `userAppointmentsCtrl error ${err.message}`,
+    });
+  }
+};
+
 module.exports = {
   loginCtrl,
   registerController,
@@ -386,5 +455,6 @@ module.exports = {
   bookingAvailiblityCtrl,
   userAppointmentsCtrl,
   getDoctors,
-  adminLogin
+  adminLogin,
+  updateAppoitment,
 };

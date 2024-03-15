@@ -7,12 +7,14 @@ const {
   doctorAppointmentsCtrl,
   updateStatusCtrl,
   getAllDoctors,
+  doctorLogin,
 } = require("../controllers/doctorCtrl");
 
 const router = express.Router();
 
 // single doc info
 router.post("/getDoctorInfo", authMiddleware, getDoctorInfoCtrl);
+router.post("/doctor-login", doctorLogin);
 
 // single doc info
 router.post("/getDoctors", getAllDoctors);
@@ -25,7 +27,7 @@ router.post("/updateProfile", authMiddleware, updateProfileCtrl);
 router.post("/getDoctorById", authMiddleware, getDoctorByIdCtrl);
 
 // get appoinment
-router.get("/doctor-appointments", authMiddleware, doctorAppointmentsCtrl);
+router.post("/doctor-appointments", authMiddleware, doctorAppointmentsCtrl);
 
 // post update status
 

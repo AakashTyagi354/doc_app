@@ -13,6 +13,7 @@ const {
   getAllDoctorsCtrl,
   bookAppointmentCtrl,
   adminLogin,
+  updateAppoitment,
 } = require("../controllers/userCtrl");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -54,6 +55,7 @@ router.post("/book-appointment", authMiddleware, bookAppointmentCtrl);
 router.post("/booking-availbility", authMiddleware, bookingAvailiblityCtrl);
 
 // appointment list
-router.get("/user-appointments", authMiddleware, userAppointmentsCtrl);
+router.post("/user-appointments", authMiddleware, userAppointmentsCtrl);
+router.post("/update-appointment", authMiddleware, updateAppoitment);
 
 module.exports = router;
