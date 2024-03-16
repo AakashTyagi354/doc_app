@@ -55,6 +55,10 @@ const doctorSchema = new mongoose.Schema(
     timings: {
       type: Object,
     },
+    gender: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

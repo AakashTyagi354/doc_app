@@ -19,10 +19,12 @@ exports.createCategoryController = async (req, res) => {
       name,
       slug: slugify(name),
     }).save();
+    const allCategories = await categoryModel.find();
     res.status(201).send({
       success: true,
       message: "New category created",
       category,
+      allCategories,
     });
   } catch (error) {
     console.log(error);
@@ -44,10 +46,12 @@ exports.updateCategoryController = async (req, res) => {
       { name, slug: slugify(name) },
       { new: true }
     );
+    const allCategories = await categoryModel.find({});
     res.status(200).send({
       success: true,
       message: "Category Updated Successfully",
       category,
+      allCategories,
     });
   } catch (error) {
     console.log(error);
@@ -102,9 +106,11 @@ exports.deleteCategoryController = async (req, res) => {
   try {
     const { id } = req.params;
     await categoryModel.findByIdAndDelete(id);
+    const allCategories = await categoryModel.find({});
     res.status(200).send({
       success: true,
       message: "Category Deleted Successfully",
+      allCategories,
     });
   } catch (error) {
     console.log(error);

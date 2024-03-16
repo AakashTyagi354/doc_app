@@ -5,6 +5,7 @@ const {
   deleteCategoryCOntroller,
   singleCategoryController,
   updateCategoryController,
+  deleteCategoryController,
 } = require("./../controllers/categoryController");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -15,13 +16,14 @@ const router = express.Router();
 router.post("/create-category", authMiddleware, createCategoryController);
 
 //update category
-router.put("/update-category/:id", authMiddleware, updateCategoryController);
+router.post("/update-category/:id", updateCategoryController);
 
 //getAll category
 router.get("/get-category", categoryController);
 
 //single category
 router.get("/single-category/:slug", singleCategoryController);
+router.post("/delete-category/:id", deleteCategoryController);
 
 //delete category
 // router.delete("/delete-category/:id", authMiddleware, deleteCategoryCOntroller);

@@ -14,6 +14,7 @@ const {
   bookAppointmentCtrl,
   adminLogin,
   updateAppoitment,
+  clearAllNotification,
 } = require("../controllers/userCtrl");
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -44,6 +45,8 @@ router.post(
   authMiddleware,
   deleteAllNotificationCtrl
 );
+
+router.post("/clear-all-notifications", clearAllNotification);
 
 // // get all doctor
 // router.get("/getAllDoctors", getAllDoctorsCtrl);

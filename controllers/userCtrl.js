@@ -150,6 +150,13 @@ const authCtrl = async (req, res) => {
 const applyDoctorCtrl = async (req, res) => {
   try {
     // Hash the password
+    const doc = await doctorModel.findOne({ email: req.body.email });
+    if (doc) {
+      return res.status(200).send({
+        success: false,
+        message: "doc already exists",
+      });
+    }
     const password = req.body.password;
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -277,7 +284,35 @@ const deleteAllNotificationCtrl = async (req, res) => {
     res.status(200).send({
       success: true,
       message: "Notification deleted successfully",
-      data: updatedUser,
+      data: updatedUser.notification,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({
+      success: false,
+      message: `deleteAllNotificationCtrl error ${err.message}`,
+    });
+  }
+};
+
+const clearAllNotification = async (req, res) => {
+  try {
+    const user = await userModel.findOne({ _id: req.body.userId });
+
+    // Remove the notification at the specified index
+    user.notification = [];
+
+    // Save the updated user
+    const updatedUser = await user.save();
+    updatedUser.password = undefined;
+
+    // Log the updated user object
+    console.log(updatedUser);
+
+    res.status(200).send({
+      success: true,
+      message: "Notification deleted successfully",
+      data: updatedUser.notification,
     });
   } catch (err) {
     console.log(err);
@@ -319,7 +354,7 @@ const bookAppointmentCtrl = async (req, res) => {
     });
     if (exisitingAppointment) {
       return res.status(200).send({
-        success:false,
+        success: false,
         message: "Appointment booked already only allowed once at a time",
       });
     }
@@ -445,4 +480,5 @@ module.exports = {
   getDoctors,
   adminLogin,
   updateAppoitment,
+  clearAllNotification,
 };
