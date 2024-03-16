@@ -308,17 +308,18 @@ const getAllDoctorsCtrl = async (req, res) => {
 // book apoinment
 const bookAppointmentCtrl = async (req, res) => {
   try {
-    req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString();
-    req.body.time = moment(req.body.time, "HH:mm").toISOString();
+    console.log("Date", req.body.date);
+    console.log("Time", req.body.time);
+    // req.body.date = moment(req.body.date, "DD-MM-YYYY").toISOString();
+    // req.body.time = moment(req.body.time, "HH:mm").toISOString();
     req.body.status = "pending";
     const exisitingAppointment = await appointmentModel.findOne({
       userId: req.body.userId,
       doctorId: req.body.doctorId,
-      date: req.body.date,
-      time: req.body.time,
     });
     if (exisitingAppointment) {
       return res.status(200).send({
+        success:false,
         message: "Appointment booked already only allowed once at a time",
       });
     }
@@ -365,29 +366,16 @@ const bookAppointmentCtrl = async (req, res) => {
 const bookingAvailiblityCtrl = async (req, res) => {
   console.log("hello", req.body);
   try {
-    const date = moment(req.body.date, "DD-MM-YYYY").toISOString();
-    const formTime = moment(req.body.time, "HH:mm")
-      .subtract(1, "hours")
-      .toISOString();
-    const toTime = moment(req.body.time, "HH:mm").add(1, "hours").toISOString();
-    const doctorId = req.body.doctorId;
-    // const appointment = await appointmentModel.find({
-    //   doctorId,
-    //   date,
-    //   time: {
-    //     $gte: formTime,
-    //     $lte: toTime,
-    //   },
-    // });
     const exisitingAppointment = await appointmentModel.findOne({
       userId: req.body.userId,
       doctorId: req.body.doctorId,
       date: req.body.date,
       time: req.body.time,
     });
-    if (exisitingAppointment?.length > 0) {
+    console.log(exisitingAppointment);
+    if (exisitingAppointment) {
       return res.status(200).send({
-        success: true,
+        success: false,
         message: "Appointment Already Booked",
       });
     } else {

@@ -178,6 +178,36 @@ const updateStatusCtrl = async (req, res) => {
   }
 };
 
+const filterDoctorsController = async (req, res) => {
+  try {
+    const { params: queryString } = req.params;
+
+    // Create a regular expression to match the query string in a case-insensitive manner
+    const regex = new RegExp(queryString, "i");
+
+    // Construct the query to search across multiple fields
+    const doctors = await doctorModel.find({
+      $or: [
+        { firstName: regex }, // Match any part of the first name
+        { specialization: regex }, // Match any part of the specialization
+      ],
+    });
+
+    res.status(200).send({
+      success: true,
+      message: "Success in searching for doctors",
+      data: doctors,
+    });
+  } catch (error) {
+    console.error("Error in Doctor Filtering API:", error);
+    res.status(500).send({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   getDoctorInfoCtrl,
   updateProfileCtrl,
@@ -186,4 +216,5 @@ module.exports = {
   updateStatusCtrl,
   getAllDoctors,
   doctorLogin,
+  filterDoctorsController,
 };

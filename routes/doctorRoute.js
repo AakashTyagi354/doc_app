@@ -8,6 +8,7 @@ const {
   updateStatusCtrl,
   getAllDoctors,
   doctorLogin,
+  filterDoctorsController,
 } = require("../controllers/doctorCtrl");
 
 const router = express.Router();
@@ -32,5 +33,8 @@ router.post("/doctor-appointments", authMiddleware, doctorAppointmentsCtrl);
 // post update status
 
 router.post("/update-status", authMiddleware, updateStatusCtrl);
+
+// search
+router.get("/search-doctors/:params", filterDoctorsController);
 
 module.exports = router;
