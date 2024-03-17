@@ -29,6 +29,12 @@ app.use(express.static(path.join(__dirname, "./myclient/build")));
 app.get("*", function (req, res) {
   res.sendFile(path.join(__dirname, "./myclient/build/index.html"));
 });
+app.use("/", (req, res) => {
+  res.status(200).send({
+    success: true,
+    message: "API working",
+  });
+});
 
 // exports.instance = new Razorpay({
 //   key_id: process.env.RAZORPAY_API_KEY,
