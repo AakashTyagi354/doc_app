@@ -51,12 +51,13 @@ const changeAccountStatusCtrl = async (req, res) => {
     //   onClickPth: "/notification",
     // });
     // user.isDoctor = status === "approved" ? true : false;
-    
+
     await doctor.save();
+    const doctors = await doctorModel.find({});
     res.status(201).send({
       success: true,
       message: "Account Status Updated",
-      data: doctor,
+      data: doctors,
     });
   } catch (err) {
     console.log(err);

@@ -172,16 +172,18 @@ const applyDoctorCtrl = async (req, res) => {
 
     // Update admin's notification
     const adminUser = await userModel.findOne({ isAdmin: true });
-    adminUser.notification.push({
-      type: "apply-doctor-request",
-      message: `${doctor.firstName} ${doctor.lastName} has applied for a doctor account`,
-      data: {
-        doctorId: doctor._id,
-        name: doctor.firstName + " " + doctor.lastName,
-        onClickPath: "/admin/doctors",
-      },
-    });
-    await adminUser.save();
+    if (adminUser) {
+      adminUser.notification.push({
+        type: "apply-doctor-request",
+        message: `${doctor.firstName} ${doctor.lastName} has applied for a doctor account`,
+        data: {
+          doctorId: doctor._id,
+          name: doctor.firstName + " " + doctor.lastName,
+          onClickPath: "/admin/doctors",
+        },
+      });
+      await adminUser.save();
+    }
 
     // Send success response
     res
