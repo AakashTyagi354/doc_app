@@ -15,6 +15,7 @@ const {
   realtedProductController,
   searchProductController,
   updateProductController,
+  addressController,
 } = require("../controllers/productController.js");
 const authMiddleware = require("../middleware/authMiddleware.js");
 
@@ -64,6 +65,7 @@ router.get("/related-product/:pid/:cid", realtedProductController);
 
 //category wise product
 router.get("/product-category/:slug", productCategoryController);
+router.post("/add-address", authMiddleware, addressController);
 
 //payments routes
 //token

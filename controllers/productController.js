@@ -6,6 +6,7 @@ const fs = require("fs");
 const slugify = require("slugify");
 const braintree = require("braintree");
 const dotenv = require("dotenv");
+const addressModel = require("../models/address.js");
 
 dotenv.config();
 
@@ -422,5 +423,26 @@ exports.brainTreePaymentController = async (req, res) => {
     );
   } catch (error) {
     console.log(error);
+  }
+};
+
+// Product Category Controller
+exports.addressController = async (req, res) => {
+  try {
+    const { address, userId } = req.body;
+    const newAddress = new addressModel.create({ address, userId });
+    await newAddress.save();
+
+    res.status(200).send({
+      success: true,
+      newAddress,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).send({
+      success: false,
+      error,
+      message: "Error While adding new Address",
+    });
   }
 };

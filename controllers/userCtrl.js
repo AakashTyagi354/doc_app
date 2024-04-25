@@ -409,6 +409,7 @@ const bookingAvailiblityCtrl = async (req, res) => {
       date: req.body.date,
       time: req.body.time,
     });
+    if(req.body.date )
     console.log(exisitingAppointment);
     if (exisitingAppointment) {
       return res.status(200).send({
