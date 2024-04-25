@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const doctorModel = require("../models/docModel");
 const appointmentModel = require("../models/appoinmentModel");
 const moment = require("moment");
+const redis = require("../config/redis");
 
 // register
 const registerController = async (req, res) => {
@@ -106,18 +107,50 @@ const loginCtrl = async (req, res) => {
   }
 };
 
-// get doctors
+// // get doctors
+// const getDoctors = async (req, res) => {
+//   try {
+//     const doctors = await doctorModel.find({ status: "approved" });
+//     res
+//       .status(201)
+//       .send({ message: "All doctors available", success: true, doctors });
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).send({
+//       success: false,
+//       message: `error in fetching all doctores for user ${err.message}`,
+//     });
+//   }
+// };
+
 const getDoctors = async (req, res) => {
   try {
-    const doctors = await doctorModel.find({ status: "approved" });
-    res
-      .status(201)
-      .send({ message: "All doctors available", success: true, doctors });
+
+    const cachedDoctors = await redis.get("doctors");
+    if (cachedDoctors) {
+
+      res.status(200).json({
+        message: "Doctors retrieved from Redis cache",
+        success: true,
+        doctors: JSON.parse(cachedDoctors),
+      });
+    } else {
+
+      const doctors = await doctorModel.find({ status: "approved" });
+ 
+      await redis.set("doctors", JSON.stringify(doctors));
+   
+      res.status(200).json({
+        message: "Doctors retrieved from MongoDB",
+        success: true,
+        doctors,
+      });
+    }
   } catch (err) {
-    console.log(err);
-    res.status(500).send({
+    console.error("Error fetching doctors:", err);
+    res.status(500).json({
       success: false,
-      message: `error in fetching all doctores for user ${err.message}`,
+      message: `Error fetching doctors: ${err.message}`,
     });
   }
 };
@@ -409,8 +442,7 @@ const bookingAvailiblityCtrl = async (req, res) => {
       date: req.body.date,
       time: req.body.time,
     });
-    if(req.body.date )
-    console.log(exisitingAppointment);
+    if (req.body.date) console.log(exisitingAppointment);
     if (exisitingAppointment) {
       return res.status(200).send({
         success: false,
